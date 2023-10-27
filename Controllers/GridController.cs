@@ -28,5 +28,27 @@ namespace GridOrganizerBackend.Controllers
         {
             return Ok(await _gridService.AddGrid(newGrid));
         }
+
+        [HttpPut]
+        public async Task<ActionResult<ServiceResponse<List<GetGridDto>>>> UpdateGrid(UpdateGridDto updatedGrid)
+        {
+            var response = await _gridService.UpdateGrid(updatedGrid);
+            if (response.Data is null)
+            {
+                return NotFound(response);
+            }
+            return Ok(response);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<ServiceResponse<GetGridDto>>> DeleteGrid(int id)
+        {
+            var response = await _gridService.DeleteGrid(id);
+            if (response.Data is null)
+            {
+                return NotFound(response);
+            }
+            return Ok(response);
+        }
     }
 }

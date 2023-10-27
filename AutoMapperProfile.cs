@@ -6,6 +6,7 @@ namespace GridOrganizerBackend
         {
             CreateMap<Grid, GetGridDto>();
             CreateMap<AddGridDto, Grid>();
+            CreateMap<UpdateGridDto, Grid>();
         }
     }
 }
