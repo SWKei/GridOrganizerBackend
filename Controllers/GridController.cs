@@ -1,39 +1,32 @@
-using Microsoft.AspNetCore.Mvc;
-
 namespace GridOrganizerBackend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class GridController : ControllerBase
     {
-        private static List<Grid> grids = new List<Grid>
+        private readonly IGridService _gridService;
+
+        public GridController(IGridService gridService)
         {
-            new Grid(),
-            new Grid {
-                Id = 1,
-                Name = "Grid1"
-            }
-        };
+            _gridService = gridService;
+        }
 
         [HttpGet("GetAll")]
-        public ActionResult<List<Grid>> Get()
+        public async Task<ActionResult<ServiceResponse<List<GetGridDto>>>> Get()
         {
-            return Ok(grids);
+            return Ok(await _gridService.GetAllGrids());
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Grid> GetSingle(int id)
+        public async Task<ActionResult<ServiceResponse<GetGridDto>>> GetSingle(int id)
         {
-            return Ok(grids.FirstOrDefault(g => g.Id == id));
+            return Ok(await _gridService.GetGridById(id));
         }
 
         [HttpPost]
-        public ActionResult<List<Grid>> AddGrid(Grid newGrid)
+        public async Task<ActionResult<ServiceResponse<List<GetGridDto>>>> AddGrid(AddGridDto newGrid)
         {
-            grids.Add(newGrid);
-            return Ok(grids);
+            return Ok(await _gridService.AddGrid(newGrid));
         }
-
-
     }
 }

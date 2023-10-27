@@ -1,4 +1,8 @@
 global using GridOrganizerBackend.Models;
+global using GridOrganizerBackend.Services.GridService;
+global using GridOrganizerBackend.Dtos.Grid;
+global using AutoMapper;
+global using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +12,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddScoped<IGridService, GridService>();
 
 var app = builder.Build();
 
