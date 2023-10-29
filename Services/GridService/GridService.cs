@@ -2,91 +2,42 @@ namespace GridOrganizerBackend.Services.GridService
 {
     public class GridService : IGridService
     {
-        private static List<Grid> grids = new List<Grid>
-        {
-            new Grid
-            {
-                Id = 0,
-                Name = "Grid1",
-                GridItems = new StatusEnum[]
-                {
-                    StatusEnum.None,
-                    StatusEnum.None,
-                    StatusEnum.None,
-                    StatusEnum.None,
-                    StatusEnum.None,
-                    StatusEnum.Ok,
-                    StatusEnum.Ok,
-                    StatusEnum.Ok,
-                    StatusEnum.Ok,
-                    StatusEnum.Ok,
-                    StatusEnum.Warning,
-                    StatusEnum.Warning,
-                    StatusEnum.Warning,
-                    StatusEnum.Warning,
-                    StatusEnum.Warning,
-                    StatusEnum.Error,
-                    StatusEnum.Error,
-                    StatusEnum.Error,
-                    StatusEnum.Error,
-                    StatusEnum.Error,
-                    StatusEnum.None,
-                    StatusEnum.None,
-                    StatusEnum.None,
-                    StatusEnum.None,
-                    StatusEnum.None,
-                }
-            },
-            new Grid
-            {
-                Id = 1,
-                Name = "Grid2",
-                GridItems = new StatusEnum[]
-                {
-                    StatusEnum.None,
-                    StatusEnum.None,
-                    StatusEnum.None,
-                    StatusEnum.None,
-                    StatusEnum.None,
-                    StatusEnum.Ok,
-                    StatusEnum.Ok,
-                    StatusEnum.Ok,
-                    StatusEnum.Ok,
-                    StatusEnum.Ok,
-                    StatusEnum.Warning,
-                    StatusEnum.Warning,
-                    StatusEnum.Warning,
-                    StatusEnum.Warning,
-                    StatusEnum.Warning,
-                    StatusEnum.Error,
-                    StatusEnum.Error,
-                    StatusEnum.Error,
-                    StatusEnum.Error,
-                    StatusEnum.Error,
-                    StatusEnum.None,
-                    StatusEnum.None,
-                    StatusEnum.None,
-                    StatusEnum.None,
-                    StatusEnum.None,
-                }
-            },
-
-        };
         private readonly IMapper _mapper;
+        private readonly DataContext _context;
 
-        public GridService(IMapper mapper)
+        public GridService(IMapper mapper, DataContext context)
         {
             _mapper = mapper;
+            _context = context;
         }
 
         public async Task<ServiceResponse<List<GetGridDto>>> AddGrid(AddGridDto newGrid)
         {
             var serviceResponse = new ServiceResponse<List<GetGridDto>>();
 
-            var grid = _mapper.Map<Grid>(newGrid);
-            grid.Id = grids.Max(g => g.Id) + 1;
-            grids.Add(grid);
-            serviceResponse.Data = grids.Select(g => _mapper.Map<GetGridDto>(g)).ToList();
+            // Test Data start
+            newGrid = new AddGridDto
+            {
+                Name = "Default rutnät",
+                GridItems = new List<GridItem>()
+            };
+            for (int i = 0; i < 25; i++)
+            {
+                GridItem newObj = new GridItem
+                {
+                    Status = "None"
+                };
+                newGrid.GridItems.Add(newObj);
+            }
+            // Test Data end
+
+            var grid = _mapper.Map<AddGridDto, Grid>(newGrid);
+
+            _context.Grids.Add(grid);
+            await _context.SaveChangesAsync();
+
+            var dbGrids = await _context.Grids.Include(g => g.GridItems).ToListAsync();
+            serviceResponse.Data = dbGrids.Select(g => _mapper.Map<GetGridDto>(g)).ToList();
 
             return serviceResponse;
         }
@@ -97,14 +48,21 @@ namespace GridOrganizerBackend.Services.GridService
 
             try
             {
-                var grid = grids.First(g => g.Id == id);
+                var grid = await _context.Grids.Include(g => g.GridItems)
+                    .FirstOrDefaultAsync(g => g.Id == id);
+
                 if (grid is null)
                 {
                     throw new Exception($"Grid with Id '{id}' not found. ");
                 }
-                grids.Remove(grid);
 
-                serviceResponse.Data = grids.Select(g => _mapper.Map<GetGridDto>(g)).ToList();
+                _context.GridItems.RemoveRange(grid.GridItems);
+                _context.Grids.Remove(grid);
+
+                await _context.SaveChangesAsync();
+
+                serviceResponse.Data =
+                    await _context.Grids.Include(g => g.GridItems).Select(g => _mapper.Map<GetGridDto>(g)).ToListAsync();
             }
 
             catch (Exception ex)
@@ -118,10 +76,9 @@ namespace GridOrganizerBackend.Services.GridService
 
         public async Task<ServiceResponse<List<GetGridDto>>> GetAllGrids()
         {
-            var serviceResponse = new ServiceResponse<List<GetGridDto>>
-            {
-                Data = grids.Select(g => _mapper.Map<GetGridDto>(g)).ToList()
-            };
+            var serviceResponse = new ServiceResponse<List<GetGridDto>>();
+            var dbGrids = await _context.Grids.Include(g => g.GridItems).ToListAsync();
+            serviceResponse.Data = dbGrids.Select(g => _mapper.Map<GetGridDto>(g)).ToList();
 
             return serviceResponse;
         }
@@ -130,8 +87,11 @@ namespace GridOrganizerBackend.Services.GridService
         {
             var serviceResponse = new ServiceResponse<GetGridDto>();
 
-            var grid = grids.FirstOrDefault(g => g.Id == id);
-            serviceResponse.Data = _mapper.Map<GetGridDto>(grid);
+            var dbGrid = await _context.Grids
+                .Include(g => g.GridItems)
+                .FirstOrDefaultAsync(g => g.Id == id);
+
+            serviceResponse.Data = _mapper.Map<GetGridDto>(dbGrid);
 
             return serviceResponse;
         }
@@ -142,17 +102,25 @@ namespace GridOrganizerBackend.Services.GridService
 
             try
             {
-                var grid = grids.FirstOrDefault(g => g.Id == updatedGrid.Id);
-                if (grid is null)
+                // var grid = grids.FirstOrDefault(g => g.Id == updatedGrid.Id);
+
+                var dbGrid = await _context.Grids
+                    .Include(g => g.GridItems)
+                    .FirstOrDefaultAsync(g => g.Id == updatedGrid.Id);
+
+                if (dbGrid is null)
                 {
                     throw new Exception($"Grid with Id '{updatedGrid.Id}' not found. ");
                 }
+
+                dbGrid.Name = updatedGrid.Name;
+                dbGrid.GridItems = updatedGrid.GridItems;
+
+                await _context.SaveChangesAsync();
+
                 // _mapper.Map(updatedGrid, grid);
 
-                grid.Name = updatedGrid.Name;
-                grid.GridItems = updatedGrid.GridItems;
-
-                serviceResponse.Data = _mapper.Map<GetGridDto>(grid);
+                serviceResponse.Data = _mapper.Map<GetGridDto>(dbGrid);
             }
 
             catch (Exception ex)
