@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GridOrganizerBackend", "GridOrganizerBackend.csproj", "{E8A81A8A-8B98-4B7C-8AA6-1BFD74045531}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E8A81A8A-8B98-4B7C-8AA6-1BFD74045531}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8A81A8A-8B98-4B7C-8AA6-1BFD74045531}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8A81A8A-8B98-4B7C-8AA6-1BFD74045531}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8A81A8A-8B98-4B7C-8AA6-1BFD74045531}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D1048C15-442D-4290-B3DD-58DA39FC5194}
+	EndGlobalSection
+EndGlobal

@@ -15,28 +15,14 @@ namespace GridOrganizerBackend.Services.GridService
         {
             var serviceResponse = new ServiceResponse<List<GetGridDto>>();
 
-            // Test Data start
-            newGrid = new AddGridDto
-            {
-                Name = "Default rutnät",
-                GridItems = new List<GridItem>()
-            };
-            for (int i = 0; i < 25; i++)
-            {
-                GridItem newObj = new GridItem
-                {
-                    Status = "None"
-                };
-                newGrid.GridItems.Add(newObj);
-            }
-            // Test Data end
-
             var grid = _mapper.Map<AddGridDto, Grid>(newGrid);
 
             _context.Grids.Add(grid);
             await _context.SaveChangesAsync();
 
-            var dbGrids = await _context.Grids.Include(g => g.GridItems).ToListAsync();
+            var dbGrids = await _context.Grids
+                .Include(g => g.GridItems)
+                .ToListAsync();
             serviceResponse.Data = dbGrids.Select(g => _mapper.Map<GetGridDto>(g)).ToList();
 
             return serviceResponse;
@@ -48,10 +34,11 @@ namespace GridOrganizerBackend.Services.GridService
 
             try
             {
-                var grid = await _context.Grids.Include(g => g.GridItems)
+                var grid = await _context.Grids
+                    .Include(g => g.GridItems)
                     .FirstOrDefaultAsync(g => g.Id == id);
 
-                if (grid is null)
+                if (grid is null || grid.GridItems is null)
                 {
                     throw new Exception($"Grid with Id '{id}' not found. ");
                 }
@@ -62,7 +49,10 @@ namespace GridOrganizerBackend.Services.GridService
                 await _context.SaveChangesAsync();
 
                 serviceResponse.Data =
-                    await _context.Grids.Include(g => g.GridItems).Select(g => _mapper.Map<GetGridDto>(g)).ToListAsync();
+                    await _context.Grids
+                        .Include(g => g.GridItems)
+                        .Select(g => _mapper.Map<GetGridDto>(g))
+                        .ToListAsync();
             }
 
             catch (Exception ex)
@@ -77,7 +67,9 @@ namespace GridOrganizerBackend.Services.GridService
         public async Task<ServiceResponse<List<GetGridDto>>> GetAllGrids()
         {
             var serviceResponse = new ServiceResponse<List<GetGridDto>>();
-            var dbGrids = await _context.Grids.Include(g => g.GridItems).ToListAsync();
+            var dbGrids = await _context.Grids
+                .Include(g => g.GridItems)
+                .ToListAsync();
             serviceResponse.Data = dbGrids.Select(g => _mapper.Map<GetGridDto>(g)).ToList();
 
             return serviceResponse;
@@ -102,23 +94,31 @@ namespace GridOrganizerBackend.Services.GridService
 
             try
             {
-                // var grid = grids.FirstOrDefault(g => g.Id == updatedGrid.Id);
-
                 var dbGrid = await _context.Grids
                     .Include(g => g.GridItems)
                     .FirstOrDefaultAsync(g => g.Id == updatedGrid.Id);
 
-                if (dbGrid is null)
+                if (dbGrid is null || dbGrid.GridItems is null)
                 {
                     throw new Exception($"Grid with Id '{updatedGrid.Id}' not found. ");
                 }
 
                 dbGrid.Name = updatedGrid.Name;
-                dbGrid.GridItems = updatedGrid.GridItems;
 
+                if (updatedGrid.GridItems is null)
+                {
+                    throw new Exception("GridItems should not be null.");
+                }
+                // Update GridItems
+                foreach (var item in updatedGrid.GridItems)
+                {
+                    var existingGridItem = dbGrid.GridItems.FirstOrDefault(gi => gi.Id == item.Id);
+                    if (existingGridItem != null)
+                    {
+                        existingGridItem.Status = item.Status;
+                    }
+                }
                 await _context.SaveChangesAsync();
-
-                // _mapper.Map(updatedGrid, grid);
 
                 serviceResponse.Data = _mapper.Map<GetGridDto>(dbGrid);
             }
