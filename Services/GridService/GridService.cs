@@ -88,9 +88,9 @@ namespace GridOrganizerBackend.Services.GridService
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<GetGridDto>> UpdateGrid(UpdateGridDto updatedGrid)
+        public async Task<ServiceResponse<List<GetGridDto>>> UpdateGrid(UpdateGridDto updatedGrid)
         {
-            var serviceResponse = new ServiceResponse<GetGridDto>();
+            var serviceResponse = new ServiceResponse<List<GetGridDto>>();
 
             try
             {
@@ -120,7 +120,10 @@ namespace GridOrganizerBackend.Services.GridService
                 }
                 await _context.SaveChangesAsync();
 
-                serviceResponse.Data = _mapper.Map<GetGridDto>(dbGrid);
+                var dbGrids = await _context.Grids
+                    .Include(g => g.GridItems)
+                    .ToListAsync();
+                serviceResponse.Data = dbGrids.Select(g => _mapper.Map<GetGridDto>(g)).ToList();
             }
 
             catch (Exception ex)
