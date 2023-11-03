@@ -2,7 +2,16 @@
 
 ## Thoughts and ideas
 This WEB API serves as the backend application for the frontend project [grid-organizer-frontend](https://github.com/SWKei/grid-organizer-frontend)
-Despite its small scale, I have endeavored to implement techniques and architectural principles commonly found in real-world applications.
+Despite its small scale, I have endeavored to implement techniques and architectural principles commonly found in real-world applications.\
+
+### Technical features:
+- .NET 7 Web API
+- RESTful web service calls (GET, POST, PUT, DELETE)
+- Entity Framework Core 7 (Code-first migration)
+- SQL Server (one-to-many relationship)
+- Asynchronous Calls
+- Data Transfer Objects (DTOs)
+- Controller ↔ Service ↔ Database Architecture
 
 
 ## Starting the codebase
