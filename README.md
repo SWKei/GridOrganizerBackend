@@ -2,7 +2,7 @@
 
 ## Thoughts and ideas
 This WEB API serves as the backend application for the frontend project [grid-organizer-frontend](https://github.com/SWKei/grid-organizer-frontend)
-Despite its small scale, I have endeavored to implement techniques and architectural principles commonly found in real-world applications.\
+Despite its small scale, I have endeavored to implement techniques and architectural principles commonly found in real-world applications.
 
 ### Technical features:
 - .NET 7 Web API
