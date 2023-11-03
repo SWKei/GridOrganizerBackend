@@ -46,7 +46,7 @@ dotnet ef migrations add InitialMigration
 dotnet ef database update
 ```
 
-## Buildning the Application
+## Building the Application
 - To run the API, use the following command:
 ```bash
 dotnet run
