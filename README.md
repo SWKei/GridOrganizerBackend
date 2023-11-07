@@ -56,3 +56,13 @@ dotnet run
 ```bash
 dotnet watch run
 ```
+
+ ### API endpoints
+
+| Endpoint | Description | HTTP Method | Endpoint Path | Parameters | Request Body | Response |
+| -------- | ----------- | ----------- | --------------| ---------- | ------------ | -------- |
+| Get All Grids  | Retrieves a list of all grids.  | GET  | /GetAll  | None |  | - Status Code 200 (OK) on success. - JSON response containing a list of grids. - json { "data": [ { "id": 0, "name": "string", "gridItems": [ { "id": 0, "status": "string" } ] } ], "success": true, "message": "string" } |
+| Get Single Grid  | Retrieves a single grid by its ID.  | GET  |	/{id} | - id (int) - Unique identifier of the grid to retrieve. |  | 	- Status Code 200 (OK) on success. - JSON response containing a single grid . - Status Code 404 (Not Found) if the grid with the specified ID is not found. - json { "data": { "id": 0, "name": "string", "gridItems": [ { "id": 0, "status": "string" } ] }, "success": true, "message": "string" } |
+| Add Grid  | Adds a new grid.  | POST  | / | JSON object containing the properties of the new grid. | Request Body: json { "name": "string", "gridItems": [ { "id": 0, "status": "string" } ] } | - Status Code 200 (OK) on success. - JSON response containing the newly created grid. - Example Response: json { "data": [ { "id": 0, "name": "string", "gridItems": [ { "id": 0, "status": "string" } ] } ], "success": true, "message": "string" } |
+| Update Grid  | Updates an existing grid.  | PUT  | /  | JSON object containing the updated properties of the grid. | Request Body: json { "id": 0, "name": "string", "gridItems": [ { "id": 0, "status": "string" } ] } | - Status Code 200 (OK) on success. - JSON response containing the updated grid. - Status Code 404 (Not Found) if the grid with the specified ID is not found. - json { "data": [ { "id": 0, "name": "string", "gridItems": [ { "id": 0, "status": "string" } ] } ], "success": true, "message": "string" }  |
+| Delete Grid  | Deletes a grid by its ID.  | DELETE  | /{id}  | - id (int) - Unique identifier of the grid to delete. |  | - Status Code 200 (OK) on success. - Status Code 404 (Not Found) if the grid with the specified ID is not found. - json { "data": [ { "id": 0, "name": "string", "gridItems": [ { "id": 0, "status": "string" } ] } ], "success": true, "message": "string" } |
