@@ -20,7 +20,12 @@ namespace GridOrganizerBackend.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<ServiceResponse<GetGridDto>>> GetSingle(int id)
         {
-            return Ok(await _gridService.GetGridById(id));
+            var response = await _gridService.GetGridById(id);
+            if (response.Data is null)
+            {
+                return NotFound(response);
+            }
+            return Ok(response);
         }
 
         [HttpPost]
@@ -41,7 +46,7 @@ namespace GridOrganizerBackend.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ServiceResponse<GetGridDto>>> DeleteGrid(int id)
+        public async Task<ActionResult<ServiceResponse<List<GetGridDto>>>> DeleteGrid(int id)
         {
             var response = await _gridService.DeleteGrid(id);
             if (response.Data is null)
