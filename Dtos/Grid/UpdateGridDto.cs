@@ -3,7 +3,8 @@ namespace GridOrganizerBackend.Dtos.Grid
     public class UpdateGridDto
     {
         public int Id { get; set; }
-        public string Name { get; set; } = "New Grid";
+        [Required(ErrorMessage = "Name field is required.")]
+        public required string Name { get; set; }
         public List<GridItem>? GridItems { get; set; }
     }
 }

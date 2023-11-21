@@ -15,6 +15,13 @@ namespace GridOrganizerBackend.Services.GridService
         {
             var serviceResponse = new ServiceResponse<List<GetGridDto>>();
 
+            if (await _context.Grids.AnyAsync(g => g.Name.ToUpper() == newGrid.Name.ToUpper()))
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = "A grid with the same name already exists in the database.";
+                return serviceResponse;
+            }
+
             var grid = _mapper.Map<AddGridDto, Grid>(newGrid);
 
             _context.Grids.Add(grid);
@@ -94,18 +101,23 @@ namespace GridOrganizerBackend.Services.GridService
 
             try
             {
+                if (await _context.Grids.AnyAsync(g => g.Name.ToUpper() == updatedGrid.Name.ToUpper() && g.Id != updatedGrid.Id))
+                {
+                    throw new Exception("A grid with the updated name already exists in the database.");
+                }
+
                 var dbGrid = await _context.Grids
                     .Include(g => g.GridItems)
                     .FirstOrDefaultAsync(g => g.Id == updatedGrid.Id);
 
-                if (dbGrid is null || dbGrid.GridItems is null)
+                if (dbGrid == null || dbGrid.GridItems == null)
                 {
-                    throw new Exception($"Grid with Id '{updatedGrid.Id}' not found. ");
+                    throw new Exception($"Grid with Id '{updatedGrid.Id}' not found.");
                 }
 
                 dbGrid.Name = updatedGrid.Name;
 
-                if (updatedGrid.GridItems is null)
+                if (updatedGrid.GridItems == null)
                 {
                     throw new Exception("GridItems should not be null.");
                 }

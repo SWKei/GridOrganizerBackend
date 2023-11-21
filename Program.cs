@@ -5,6 +5,7 @@ global using AutoMapper;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.EntityFrameworkCore;
 global using GridOrganizerBackend.Data;
+global using System.ComponentModel.DataAnnotations;
 
 
 var builder = WebApplication.CreateBuilder(args);
